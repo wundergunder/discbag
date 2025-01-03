@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { DiscCard } from './DiscCard';
+import { LoadingSpinner } from '../common/LoadingSpinner';
 import type { InventoryFiltersState } from '../../pages/InventoryPage';
 import type { UserDisc, DiscModel, DiscManufacturer } from '../../types/database';
 
@@ -15,64 +16,76 @@ interface DiscWithDetails extends UserDisc {
   };
   storage_location: {
     name: string;
-  };
+  } | null;
 }
 
 export function InventoryList({ userId, filters }: InventoryListProps) {
   const [discs, setDiscs] = useState<DiscWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadDiscs() {
       if (!userId) return;
 
-      let query = supabase
-        .from('user_discs')
-        .select(`
-          *,
-          disc_model:disc_model_id (
+      try {
+        let query = supabase
+          .from('user_discs')
+          .select(`
             *,
-            manufacturer:manufacturer_id (*)
-          ),
-          storage_location:storage_location_id (name)
-        `)
-        .eq('user_id', userId);
+            disc_model:disc_model_id (
+              *,
+              manufacturer:manufacturer_id (*)
+            ),
+            storage_location:storage_location_id (name)
+          `)
+          .eq('user_id', userId);
 
-      if (filters.manufacturer) {
-        query = query.eq('disc_model.manufacturer_id', filters.manufacturer);
-      }
-      if (filters.discType) {
-        query = query.eq('disc_model.type', filters.discType);
-      }
-      if (filters.condition) {
-        query = query.eq('condition', filters.condition);
-      }
-      if (filters.location) {
-        query = query.eq('storage_location_id', filters.location);
-      }
-      if (filters.search) {
-        query = query.or(`
-          disc_model.name.ilike.%${filters.search}%,
-          disc_model.manufacturer.name.ilike.%${filters.search}%
-        `);
-      }
+        if (filters.manufacturer) {
+          query = query.eq('disc_model.manufacturer_id', filters.manufacturer);
+        }
+        if (filters.discType) {
+          query = query.eq('disc_model.type', filters.discType);
+        }
+        if (filters.condition) {
+          query = query.eq('condition', filters.condition);
+        }
+        if (filters.location) {
+          query = query.eq('storage_location_id', filters.location);
+        }
+        if (filters.search) {
+          query = query.or(`
+            disc_model.name.ilike.%${filters.search}%,
+            disc_model.manufacturer.name.ilike.%${filters.search}%
+          `);
+        }
 
-      const { data, error } = await query;
+        const { data, error } = await query;
 
-      if (error) {
-        console.error('Error loading discs:', error);
-        return;
+        if (error) throw error;
+
+        setDiscs(data as DiscWithDetails[]);
+      } catch (err) {
+        console.error('Error loading discs:', err);
+        setError('Failed to load discs. Please try again.');
+      } finally {
+        setLoading(false);
       }
-
-      setDiscs(data as DiscWithDetails[]);
-      setLoading(false);
     }
 
     loadDiscs();
   }, [userId, filters]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
   }
 
   if (discs.length === 0) {

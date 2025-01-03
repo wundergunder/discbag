@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Edit2, Trash2, Tag, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { formatCondition, getConditionColor } from '../../utils/discConditions';
 import type { UserDisc, DiscModel, DiscManufacturer } from '../../types/database';
 
 interface DiscCardProps {
@@ -10,13 +11,17 @@ interface DiscCardProps {
     };
     storage_location: {
       name: string;
-    };
+    } | null;
   };
 }
 
 export function DiscCard({ disc }: DiscCardProps) {
   const [loading, setLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+
+  if (!disc?.disc_model?.manufacturer) {
+    return null;
+  }
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this disc?')) return;
@@ -32,17 +37,6 @@ export function DiscCard({ disc }: DiscCardProps) {
       alert('Failed to delete disc');
     }
     setLoading(false);
-  };
-
-  const getConditionColor = (condition: string) => {
-    const colors = {
-      new: 'bg-green-100 text-green-800',
-      like_new: 'bg-blue-100 text-blue-800',
-      good: 'bg-yellow-100 text-yellow-800',
-      fair: 'bg-orange-100 text-orange-800',
-      poor: 'bg-red-100 text-red-800',
-    };
-    return colors[condition as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   return (
@@ -78,7 +72,6 @@ export function DiscCard({ disc }: DiscCardProps) {
           </div>
         </div>
 
-        {/* Disc Images */}
         {(disc.front_url || disc.back_url) && (
           <div className="grid grid-cols-2 gap-4 mb-4">
             {disc.front_url && (
@@ -112,13 +105,13 @@ export function DiscCard({ disc }: DiscCardProps) {
           </div>
           <div>
             <p className="text-sm text-gray-600">Location</p>
-            <p className="font-medium">{disc.storage_location.name}</p>
+            <p className="font-medium">{disc.storage_location?.name || 'No location set'}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 mb-4">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConditionColor(disc.condition)}`}>
-            {disc.condition.replace('_', ' ').toUpperCase()}
+            {formatCondition(disc.condition)}
           </span>
           {disc.weight && (
             <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
@@ -139,9 +132,7 @@ export function DiscCard({ disc }: DiscCardProps) {
           </div>
         )}
 
-        <button
-          className="mt-4 w-full flex items-center justify-center gap-2 py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-700 border border-blue-600 hover:border-blue-700 rounded-md"
-        >
+        <button className="mt-4 w-full flex items-center justify-center gap-2 py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-700 border border-blue-600 hover:border-blue-700 rounded-md">
           <Tag size={16} />
           List for Sale
         </button>

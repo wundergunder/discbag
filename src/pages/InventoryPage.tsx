@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Layout } from '../components/layout/Layout';
 import { InventoryFilters } from '../components/inventory/InventoryFilters';
 import { InventoryList } from '../components/inventory/InventoryList';
 import { AddDiscButton } from '../components/inventory/AddDiscButton';
@@ -19,16 +18,14 @@ export function InventoryPage() {
   const [filters, setFilters] = useState<InventoryFiltersState>({});
 
   return (
-    <Layout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">My Disc Inventory</h1>
-          <AddDiscButton />
-        </div>
-
-        <InventoryFilters filters={filters} onFilterChange={setFilters} />
-        <InventoryList userId={user?.id} filters={filters} />
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">My Disc Inventory</h1>
+        <AddDiscButton />
       </div>
-    </Layout>
+
+      <InventoryFilters filters={filters} onFilterChange={setFilters} />
+      <InventoryList userId={user?.id} filters={filters} />
+    </div>
   );
 }

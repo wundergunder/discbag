@@ -5,6 +5,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { SignUpPage } from '../pages/SignUpPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { InventoryPage } from '../pages/InventoryPage';
+import { SelectDiscPage } from '../pages/SelectDiscPage';
 import { AddDiscPage } from '../pages/AddDiscPage';
 import { MarketplacePage } from '../pages/MarketplacePage';
 import { CreateListingPage } from '../pages/CreateListingPage';
@@ -17,25 +18,22 @@ export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      // Public routes
       {
-        path: '/login',
+        path: 'login',
         element: <LoginPage />,
       },
       {
-        path: '/signup',
+        path: 'signup',
         element: <SignUpPage />,
       },
-      // Protected routes with layout
       {
-        path: '/',
         element: <ProtectedRoute />,
         children: [
           {
             element: <Layout />,
             children: [
               {
-                index: true,
+                path: '/',
                 element: <DashboardPage />,
               },
               {
@@ -47,7 +45,11 @@ export const router = createBrowserRouter([
                 element: <InventoryPage />,
               },
               {
-                path: 'inventory/add',
+                path: 'inventory/select',
+                element: <SelectDiscPage />,
+              },
+              {
+                path: 'inventory/add/:modelId',
                 element: <AddDiscPage />,
               },
               {

@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { Save } from 'lucide-react';
-import { DiscImageUpload } from '../DiscImageUpload';
 import type { UserDisc, DiscCondition } from '../../../types/database';
 
 interface DiscDetailsFormProps {
-  onSubmit: (data: Omit<UserDisc, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => void;
+  onSubmit: (data: Omit<UserDisc, 'id' | 'user_id' | 'disc_model_id' | 'created_at' | 'updated_at'>) => void;
   loading: boolean;
-  discId?: string;
 }
 
-export function DiscDetailsForm({ onSubmit, loading, discId }: DiscDetailsFormProps) {
+const CONDITIONS: { value: DiscCondition; label: string }[] = [
+  { value: 'new', label: 'New' },
+  { value: 'like_new', label: 'Like New' },
+  { value: 'good', label: 'Good' },
+  { value: 'fair', label: 'Fair' },
+  { value: 'poor', label: 'Poor' },
+];
+
+export function DiscDetailsForm({ onSubmit, loading }: DiscDetailsFormProps) {
   const [formData, setFormData] = useState({
     condition: 'new' as DiscCondition,
     weight: '',
     color: '',
     personal_notes: '',
-    front_url: '',
-    back_url: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,29 +28,12 @@ export function DiscDetailsForm({ onSubmit, loading, discId }: DiscDetailsFormPr
     onSubmit({
       ...formData,
       weight: formData.weight ? parseInt(formData.weight) : null,
+      storage_location_id: null, // This will be set by the parent component
     });
-  };
-
-  const handleImageUploaded = (urls: { front_url?: string; back_url?: string }) => {
-    setFormData(prev => ({
-      ...prev,
-      ...urls,
-    }));
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {discId && (
-        <DiscImageUpload
-          discId={discId}
-          onImageUploaded={handleImageUploaded}
-          existingImages={{
-            front_url: formData.front_url,
-            back_url: formData.back_url,
-          }}
-        />
-      )}
-
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -61,11 +48,9 @@ export function DiscDetailsForm({ onSubmit, loading, discId }: DiscDetailsFormPr
             }))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="new">New</option>
-            <option value="like_new">Like New</option>
-            <option value="good">Good</option>
-            <option value="fair">Fair</option>
-            <option value="poor">Poor</option>
+            {CONDITIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
           </select>
         </div>
 
@@ -120,7 +105,7 @@ export function DiscDetailsForm({ onSubmit, loading, discId }: DiscDetailsFormPr
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Adding Disc...' : (
           <>
