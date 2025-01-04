@@ -6,7 +6,7 @@ export function SignUpPage() {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
-    navigate('/dashboard');
+    navigate('/profile');
   };
 
   return (

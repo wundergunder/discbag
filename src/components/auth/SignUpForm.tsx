@@ -27,7 +27,7 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
       const { error } = await signUp({ email, password });
       if (error) throw error;
       
-      navigate('/dashboard');
+      navigate('/profile');
       onSuccess();
     } catch (err) {
       console.error('Signup error:', err);
