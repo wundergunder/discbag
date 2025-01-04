@@ -5,7 +5,7 @@ export interface UserDisc {
   user_id: string;
   disc_model_id: string;
   storage_location_id: string | null;
-  condition: DiscCondition;
+  disc_condition: DiscCondition; // Updated from 'condition' to 'disc_condition'
   weight: number | null;
   color: string | null;
   personal_notes: string | null;

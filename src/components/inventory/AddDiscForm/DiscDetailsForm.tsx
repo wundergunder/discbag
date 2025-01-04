@@ -17,7 +17,7 @@ const CONDITIONS: { value: DiscCondition; label: string }[] = [
 
 export function DiscDetailsForm({ onSubmit, loading }: DiscDetailsFormProps) {
   const [formData, setFormData] = useState({
-    condition: 'new' as DiscCondition,
+    disc_condition: 'new' as DiscCondition, // Updated from 'condition' to 'disc_condition'
     weight: '',
     color: '',
     personal_notes: '',
@@ -28,7 +28,7 @@ export function DiscDetailsForm({ onSubmit, loading }: DiscDetailsFormProps) {
     onSubmit({
       ...formData,
       weight: formData.weight ? parseInt(formData.weight) : null,
-      storage_location_id: null, // This will be set by the parent component
+      storage_location_id: null,
     });
   };
 
@@ -41,10 +41,10 @@ export function DiscDetailsForm({ onSubmit, loading }: DiscDetailsFormProps) {
           </label>
           <select
             required
-            value={formData.condition}
+            value={formData.disc_condition}
             onChange={(e) => setFormData(prev => ({ 
               ...prev, 
-              condition: e.target.value as DiscCondition 
+              disc_condition: e.target.value as DiscCondition 
             }))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
